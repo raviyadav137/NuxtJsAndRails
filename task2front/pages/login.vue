@@ -17,8 +17,9 @@
   </template>
   
   <script>
+import { useToast } from 'vue-toastification';
 
-
+const toast = useToast();
   export default {
     
     data() {
@@ -48,20 +49,22 @@
           if (!response.ok) {
             const errorData = await response.json();
             console.error('Login failed:', errorData);
-            alert('Login failed. Please check your credentials or register if you have not.');
+            alert('Login failed.');
           } else {
             const data = await response.json();
             console.log('Login successful:', data);
-            localStorage.setItem('token', data.token);
-            // Set logged-in state in Vuex or localStorage
+            toast.success("logged in")
+                    localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+
             localStorage.setItem('isLoggedIn', 'true');
   
-            // Redirect to dashboard or another page on successful login
+         
             this.$router.push('/');
           }
         } catch (error) {
           console.error('Login failed:', error);
-          // Handle login errors
+       
         }
       },
       redirectToRegister() {

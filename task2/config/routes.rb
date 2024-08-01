@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :songs
       resources :artists
+      resources :statistics, only: [:index]
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

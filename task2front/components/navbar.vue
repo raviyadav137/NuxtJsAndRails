@@ -1,124 +1,97 @@
-<!-- components/Navbar.vue -->
 <template>
-    <nav class="navbar">
-       <div class="navbar-brand">
-           <nuxt-link to="/"> Dashboard</nuxt-link>
-      </div>
-      <div v-if="isLoggedIn" class="navbar-links">
-        <div class="dropdown">
-          <button class="dropbtn">Menu</button>
-          <div class="dropdown-content">
-            <nuxt-link to="/song">Song</nuxt-link>
-            <nuxt-link to="/artist">Artist</nuxt-link>
-            <nuxt-link to="/user">User</nuxt-link>
-          </div>
-        </div>
-        <button @click="logout" class="logout-button">Logout</button>
-      </div>
-      <div v-else class="navbar-links">
-        <nuxt-link to="/login">Login</nuxt-link>
-        <nuxt-link to="/register">Register</nuxt-link>
-      </div>
-    </nav>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        isLoggedIn: false
-      };
-    },
-    mounted() {
-      if (process.client) {
-        this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      }
-    },
-    methods: {
-      logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('token')
-        this.isLoggedIn = false;
-        this.$router.push('/register');
-      }
-    }
-  };
-  </script>
-  
-  <style scoped>
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #333;
-    color: white;
-    padding: 1rem;
+  <nav class="bg-green-600 h-16 py-4 px-6 flex items-center justify-around relative">
+    <i class="fas fa-bars text-white text-xl cursor-pointer lg:hidden" @click="toggleMenu"></i>
+    <h1 class="text-white text-lg font-semibold">Artist Management System</h1>
+    <ul class="hidden md:flex space-x-6 ml-auto">
+      <li class="text-white hover:text-green-300 cursor-pointer">
+        <i class="fas fa-user mr-2"></i>{{ firstName }} {{ lastName }}
+      </li>
+    </ul>
+    <div v-if="menuOpen" class="absolute h-screen top-16 left-0 px-6 bg-gray-600 text-white shadow-lg lg:hidden flex flex-col py-2">
+      <ul class="space-y-4">
+        <NuxtLink 
+          to="/" 
+          @click.native="handleLinkClick"
+          :class="{ 'text-green-300': currentRoute === '/' }"
+        >
+          <li class="hover:text-green-300 pt-10 text-2xl cursor-pointer flex items-center">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+          </li>
+        </NuxtLink>
+        <NuxtLink 
+          to="/artist"
+          @click.native="handleLinkClick"
+          :class="{ 'text-green-300': currentRoute === '/artist' }"
+        >
+          <li class="hover:text-green-300 pt-10 text-2xl cursor-pointer flex items-center">
+            <i class="fas fa-microphone-alt mr-2"></i> Artists
+          </li>
+        </NuxtLink>
+        <NuxtLink 
+          to="/song"
+          @click.native="handleLinkClick"
+          :class="{ 'text-green-300': currentRoute === '/song' }"
+        >
+          <li class="hover:text-green-300 pt-10 text-2xl cursor-pointer flex items-center">
+            <i class="fas fa-music mr-2"></i> Songs
+          </li>
+        </NuxtLink>
+        <NuxtLink 
+          to="/user"
+          @click.native="handleLinkClick"
+          :class="{ 'text-green-300': currentRoute === '/user' }"
+        >
+          <li class="hover:text-green-300 pt-10 text-2xl cursor-pointer flex items-center">
+            <i class="fas fa-users mr-2"></i> Users
+          </li>
+        </NuxtLink>
+        <li @click="logout" class="hover:text-green-300 pt-10 text-2xl cursor-pointer flex items-center">
+          <i class="fas fa-sign-out-alt mr-2"></i> Logout
+        </li>
+      </ul>
+    </div>
+  </nav>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useToast } from 'vue-toastification';
+import { useRoute, useRouter } from 'vue-router';
+
+const toast = useToast();
+const firstName = ref('');
+const lastName = ref('');
+const menuOpen = ref(false);
+const route = useRoute();
+const router = useRouter();
+
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value;
+};
+
+const handleLinkClick = (event) => {
+  if (menuOpen.value) {
+    menuOpen.value = false;
   }
-  
-  .navbar-brand {
-    font-size: 1.5rem;
-    
+};
+
+const logout = () => {
+  toast.success("Logout successfully");
+  localStorage.removeItem('token');
+  router.push('/login');
+};
+
+onMounted(() => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (user) {
+    firstName.value = user.first_name || '';
+    lastName.value = user.last_name || '';
   }
-  .navbar-brand a{
-    text-decoration:none;
-    color:white;
-  }
-  .navbar-links {
-    display: flex;
-    align-items: center;
-  }
-  
-  .navbar-links a,
-  .logout-button {
-    color: white;
-    text-decoration: none;
-    margin-left: 1rem;
-    cursor: pointer;
-  }
-  
-  .logout-button {
-    background: none;
-    border: none;
-    font-size: 1rem;
-  }
-  
-  .dropdown {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .dropbtn {
-    background-color: #333;
-    color: white;
-    padding: 1rem;
-    font-size: 1rem;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  
-  .dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-  }
-  
-  .dropdown-content a:hover {background-color: #f1f1f1;}
-  
-  .dropdown:hover .dropdown-content {
-    display: block;
-  }
-  
-  .dropdown:hover .dropbtn {
-    background-color: #555;
-  }
-  </style>
+});
+
+const currentRoute = ref(route.path);
+
+watch(route, (newRoute) => {
+  currentRoute.value = newRoute.path;
+});
+</script>
