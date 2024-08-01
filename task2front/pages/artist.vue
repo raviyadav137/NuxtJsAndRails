@@ -89,7 +89,7 @@
         </div>
         <div v-else>
           <p>No artists found.</p>
-          <button>Click me</button>
+          
         </div>
       </div>
     </div>
